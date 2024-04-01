@@ -10,26 +10,35 @@ input logic aluZero,
 input logic aluSign, 
 input logic aluCarry,
 input logic aluOverflow,
-output logic pcSrc,
+output logic [1:0] pcSrc,
 output logic [4:0] aluControl,
-output logic aluSrc,
+output logic aluSrcA,
+output logic [1:0] aluSrcB,
 output logic regWrite,
-output logic wdSrc
+output logic [1:0] wdSrc,
+output logic memWrite,
+output logic [2:0] loadOp,
+output logic immSrc
 );
 
 
-logic branch, yesbranch;
-
-logic [1:0] aluOp;
+logic branch, yesbranch, jump;
+logic [1:0] aluOp, j;
 
 always_comb
 begin
 	case (instrOpcode)
-			OP_IMM: begin aluOp<=2'b00; aluSrc<=1'b1; regWrite<=1'b1; wdSrc<=1'b0; branch <=1'b0; end
-			OP: begin aluOp<=2'b00; aluSrc<=1'b0; regWrite<=1'b1; wdSrc<=1'b0; branch <=1'b0; end
-			BRANCH: begin aluOp<=2'b01; aluSrc<=1'b0; regWrite<=1'b0; wdSrc<=1'b0; branch<=1'b1; end
+			OP_IMM: begin aluOp<=2'b00; aluSrcA <= 1'b0; aluSrcB<=2'b01; regWrite<=1'b1; wdSrc<=2'b00; memWrite = 1'b0; branch <=1'b0; jump <= 1'b0; j <= 2'b00; end
+			OP: begin aluOp<=2'b00; aluSrcA <= 1'b0; aluSrcB<=2'b00; regWrite<=1'b1; wdSrc<=2'b00; memWrite = 1'b0; branch <=1'b0; jump <= 1'b0; j <= 2'b00; end
+			LUI: begin aluOp<=2'b10; aluSrcA <= 1'b0; aluSrcB<=2'b00; regWrite<=1'b1; wdSrc<=2'b10; memWrite = 1'b0; branch <=1'b0; jump <= 1'b0; j <= 2'b00; end 
+			AUIPC: begin aluOp<=2'b10; aluSrcA <= 1'b1; aluSrcB<=2'b11; regWrite<=1'b1; wdSrc<=2'b00; memWrite = 1'b0; branch <=1'b0; jump <= 1'b0; j <= 2'b00; end 
+			BRANCH: begin aluOp<=2'b01; aluSrcA <= 1'b0; aluSrcB<=2'b00; regWrite<=1'b0; wdSrc<=2'b00; memWrite = 1'b0; branch<=1'b1; jump <= 1'b0; j <= 2'b11; end
+			LOAD: begin aluOp<=2'b11; aluSrcA <= 1'b0; aluSrcB<=2'b01; regWrite<=1'b1; wdSrc<=2'b01; memWrite = 1'b0; branch <=1'b0; jump <= 1'b0; j <= 2'b00; end
+			STORE: begin aluOp<=2'b11; aluSrcA <= 1'b0; aluSrcB<=2'b10; regWrite<=1'b0; wdSrc<=2'b01; memWrite = 1'b1; branch <=1'b0; jump <= 1'b0; j <= 2'b00; end
+			JAL: begin aluOp<=2'b10; aluSrcA <= 1'b0; aluSrcB<=2'b00; regWrite<=1'b1; wdSrc<=2'b11; memWrite = 1'b0; branch<=1'b0; jump <= 1'b1; j <= 2'b01; end
+			JALR: begin aluOp<=2'b10; aluSrcA <= 1'b0; aluSrcB<=2'b01; regWrite<=1'b1; wdSrc<=2'b11; memWrite = 1'b0; branch<=1'b0; jump <= 1'b1; j <= 2'b10; end
 			default: begin
-				aluOp<=2'b00; aluSrc<=1'b0; wdSrc<=1'b0;regWrite<=1'b0; branch <= 1'b0;
+				aluOp<=2'b00; aluSrcA <= 1'b0; aluSrcB<=2'b00; wdSrc<=2'b00; regWrite<=1'b0; memWrite <= 1'b0; branch <= 1'b0; jump <= 1'b0; j <= 2'b00;
 			end
 		endcase
 
@@ -62,11 +71,16 @@ begin
 		{2'b00, F3_SLT, 1'b0}: aluControl <= ALU_SLT;
 		{2'b00, F3_SLTU, 1'b0}: aluControl <= ALU_SLTU;
 		{2'b01, F3_DEF, 1'b?}: aluControl <= ALU_SUB; //BRANCH
+		{2'b10, F3_DEF, 1'b?}: aluControl <= ALU_ADD; //LUI, AUIPC
 		{2'b11, F3_DEF, 1'b?}: aluControl <= ALU_ADD; //LOAD and STORE (MISC_MEM)
+		
 		default: aluControl <= ALU_ADD;
 	endcase
 end
 
-assign pcSrc=yesbranch&branch;
+assign immSrc = jump;
+assign loadOp = instrFunct3;
+
+assign pcSrc = { j[1] ^ j[1]&j[0] ^ branch&yesbranch&j[1]&j[0], jump };
 
 endmodule

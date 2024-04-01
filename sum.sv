@@ -24,10 +24,10 @@ output logic [31:0] pcPlus4
 endmodule
 
 module pcBranchSum(
-input logic [31:0] immB,
+input logic [31:0] imm,
 input logic [31:0] pc,
 output logic [31:0] pcBranch
 );
-	assign pcBranch = immB + pc;
+	assign pcBranch = imm + pc;
 endmodule
 

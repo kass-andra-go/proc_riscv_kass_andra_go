@@ -1,4 +1,4 @@
-module testbench_mini();
+module tb_mini();
 
 logic clk, reset;
 int cnt = 0;
@@ -15,7 +15,7 @@ top dut (.clk(clk), .reset(reset));
 		clk <= 1; # 5; clk <= 0; # 5;
 	end
     always @(posedge clk) begin
-        if (cnt > 10) $stop;
+        if (cnt > 20) $stop;
         cnt = cnt + 1;
     end
 

@@ -9,7 +9,9 @@ output logic [4:0] rs2,
 output logic [4:0] rd,
 output logic [31:0] immU,
 output logic [31:0] immI,
-output logic [31:0] immB
+output logic [31:0] immB,
+output logic [31:0] immS,
+output logic [31:0] immJ
 );
 	assign instrOpcode = instr[6:0];
 	assign instrFunct3 = instr[14:12];
@@ -20,4 +22,6 @@ output logic [31:0] immB
 	assign immU = {instr[31:12], {12{1'b0}}};
 	assign immI = {{21{instr[31]}}, instr[30:20]};
 	assign immB = {{20{instr[31]}}, instr[7], instr[30:25], instr[11:8], 1'b0};
+	assign immS = {{21{instr[31]}}, instr[30:25], instr[11:7]};
+	assign immJ = {{12{instr[31]}}, instr[19:12], instr[20], instr[30:21], 1'b0};
 endmodule

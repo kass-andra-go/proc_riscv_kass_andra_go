@@ -1,3 +1,9 @@
+//
+// Single-cycle processor RISC-V RV32I
+// 
+// author: Gontsova Aleksandra
+//
+
 main:
 addi t0, zero, 9
 addi t1, t0, 2

@@ -1,4 +1,8 @@
-//`include "top.vh"
+//
+// Single-cycle processor RISC-V RV32I
+// 
+// author: Gontsova Aleksandra
+//
 
 module top(
 input logic clk,reset

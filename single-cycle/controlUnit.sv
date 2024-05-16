@@ -1,3 +1,9 @@
+//
+// Single-cycle processor RISC-V RV32I
+// 
+// author: Gontsova Aleksandra
+//
+
 `include "alu.vh"
 `include "controlUnit.vh"
 

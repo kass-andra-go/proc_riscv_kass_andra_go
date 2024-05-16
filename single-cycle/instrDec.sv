@@ -1,4 +1,10 @@
-//Instruction Decode
+//
+// Single-cycle processor RISC-V RV32I
+// 
+// author: Gontsova Aleksandra
+//
+
+//Instruction Decoder
 module instrDec(
 input logic [31:0] instr,
 output logic [6:0] instrOpcode,
